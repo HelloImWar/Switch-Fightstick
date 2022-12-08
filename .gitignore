@@ -1,4 +1,6 @@
 .DS_Store
+.vscode
+makefile
 *.d
 *.o
 *.bin
@@ -8,4 +10,3 @@
 *.map
 *.sym
 *.eep
-LUFA/
