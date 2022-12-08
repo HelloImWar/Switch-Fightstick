@@ -10,19 +10,17 @@ This is a program for AVR microcontrollers that uses the [LUFA library](https://
 
 ## Software installation
 
-First, you'll have to configure this program for your microcontroller board. Open the "makefile" file in this repository and change the `MCU`, `ARCH` and `F_CPU` to correspond to the microcontroller that handles USB connections. Example values:
+If you are using an Arduino Uno, Leonardo, Nano, Micro or a Teensy++ 2.0 or any board with the same microcontrollers, you can download a prebuilt version of this program from [the releases page on GitHub](https://github.com/HelloImWar/tableturf-grinder/releases/tag/latest). The files on the releases page are automatically recompiled every time this repository is updated. Make sure to download the correct file for your board:
 
-| | `MCU` | `ARCH` | `F_CPU` |
-| -: | :- | :- | :- |
-| Teensy++ 2.0 | `at90usb1286` | `AVR8` | `16000000` |
-| Arduino Leonardo / Arduino Micro | `atmega32u4` | `AVR8` | `16000000` |
-| Arduino Uno / Arduino Nano | `atmega16u2` | `AVR8` | `16000000` |
+| Board | File |
+| -: | :- |
+| Teensy++ 2.0 | Joystick-at90usb1286.hex |
+| Arduino Leonardo / Arduino Micro | Joystick-atmega32u4.hex |
+| Arduino Uno / Arduino Nano | Joystick-atmega16u2.hex |
 
-Next, you have to download the LUFA library. If you used `git clone` to download this repository, you can just run `git submodule update --init` to download LUFA into the correct location. If you downloaded this repository using the "Download ZIP" button on the GitHub website, you'll have to [download LUFA manually](https://github.com/abcminiuser/lufa/archive/refs/tags/LUFA-210130.zip) and then extract it into the LUFA folder in this repository so that the LUFA folder in this repository contains the README.txt from LUFA.
+If you prefer to manually compile programs or if there is no prebuilt binary for your board, see the [manual compilation instructions](#manual-compilation).
 
-Next, compile this program. If you're Linux or macOS, you'll need to install the `make` and `avr-libc` packages from your package manager (e.g. APT or RPM for Linux or Homebrew for macOS). If you're using Windows, the easiest way is to install Windows Subsystem for Linux 2 and then install and use `make` and `avr-libc` in there. Once you have `make` and `avr-libc` installed, just run the command `make` while inside this directory to compile the program. This will result in a file called "Joystick.hex".
-
-Now you have to flash Joystick.hex onto your microcontroller. This step varies for different boards.
+Rename the downloaded file to "Joystick.hex". Now you have to flash Joystick.hex onto your microcontroller. This step varies for different boards.
 
 ### Teensy++ 2.0
 
@@ -35,6 +33,22 @@ The [Arduino IDE](https://www.arduino.cc/en/software) can be used for these boar
 ### Arduino Uno / Arduino Nano
 The primary microcontroller on these boards do not have USB capabilities, so you'll have to flash Joystick.hex onto the USB microcontroller on the board by following [this guide](https://docs.arduino.cc/hacking/software/DFUProgramming8U2). Just use Joystick.hex as the firmware file. If you want to use your Arduino board for something else afterwards, you'll have to flash the official firmware .hex file back onto the USB microcontroller.
 
-# Usage
+## Usage
 
 Now that you have the program uploaded to your microcontroller board, place your Nintendo Switch into its dock and open Splatoon 3. You can select any Rival (not players), but it is recommended to select the level 1 Baby Jelly in Tableturf Battle (in order to minimize the time per battle, we want a low level opponent so they don't use specials whose animations will prolong the battle). Once you get to the screen where you have to select your deck, plug the USB-A end of the cable into one of the USB ports in your dock and the other end of the cable into your microcontroller board. The program will keep running until you unplug the board.
+
+## Manual compilation
+
+Here are the instructions for manually compiling the Joystick.hex files.
+
+First, you'll have to configure this program for your microcontroller board. Open the "makefile" file in this repository and change the `MCU`, `ARCH` and `F_CPU` to correspond to the microcontroller that handles USB connections. Example values:
+
+| | `MCU` | `ARCH` | `F_CPU` |
+| -: | :- | :- | :- |
+| Teensy++ 2.0 | `at90usb1286` | `AVR8` | `16000000` |
+| Arduino Leonardo / Arduino Micro | `atmega32u4` | `AVR8` | `16000000` |
+| Arduino Uno / Arduino Nano | `atmega16u2` | `AVR8` | `16000000` |
+
+Next, you have to download the LUFA library. If you used `git clone` to download this repository, you can just run `git submodule update --init` to download LUFA into the correct location. If you downloaded this repository using the "Download ZIP" button on the GitHub website, you'll have to [download LUFA manually](https://github.com/abcminiuser/lufa/archive/refs/tags/LUFA-210130.zip) and then extract it into the LUFA folder in this repository so that the LUFA folder in this repository contains the README.txt from LUFA.
+
+Next, compile this program. If you're Linux or macOS, you'll need to install the `make` and `avr-libc` packages from your package manager (e.g. APT or RPM for Linux or Homebrew for macOS). If you're using Windows, the easiest way is to install Windows Subsystem for Linux 2 and then install and use `make` and `avr-libc` in there. Once you have `make` and `avr-libc` installed, just run the command `make` while inside this directory to compile the program. This will result in a file called "Joystick.hex".
