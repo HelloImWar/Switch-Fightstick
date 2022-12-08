@@ -1,0 +1,55 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Make build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Configure for at90usb1286
+      run: sed -i -e 's/^MCU *=.*/MCU = at90usb1286/g' -e 's/^ARCH *=.*/ARCH = AVR8/g' -e 's/^F_CPU *=.*/F_CPU = 16000000/g' makefile
+
+    - name: Compile for at90usb1286
+      uses: bazhenov/action-avr-make@v1.0
+
+    - name: Store binary for at90usb1286
+      run: mv Joystick.hex Joystick-at90usb1286.hex
+
+    - name: Configure for atmega16u2
+      run: sed -i -e 's/^MCU *=.*/MCU = atmega16u2/g' -e 's/^ARCH *=.*/ARCH = AVR8/g' -e 's/^F_CPU *=.*/F_CPU = 16000000/g' makefile
+
+    - name: Compile for atmega16u2
+      uses: bazhenov/action-avr-make@v1.0
+
+    - name: Store binary for atmega16u2
+      run: mv Joystick.hex Joystick-atmega16u2.hex
+
+    - name: Configure for atmega32u4
+      run: sed -i -e 's/^MCU *=.*/MCU = atmega32u4/g' -e 's/^ARCH *=.*/ARCH = AVR8/g' -e 's/^F_CPU *=.*/F_CPU = 16000000/g' makefile
+
+    - name: Compile for atmega32u4
+      uses: bazhenov/action-avr-make@v1.0
+
+    - name: Store binary for atmega32u4
+      run: mv Joystick.hex Joystick-atmega32u4.hex
+
+    - name: Create release on GitHub
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Latest build"
+        files: |
+          *.hex
