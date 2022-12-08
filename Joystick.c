@@ -20,36 +20,11 @@ these buttons for our use.
 
 /** \file
  *
- *  Main source file for the Joystick demo. This file contains the main tasks of the demo and
+ *  Main source file for the Tableturf demo. This file contains the main tasks of the demo and
  *  is responsible for the initial application hardware configuration.
  */
 
 #include "Joystick.h"
-
-/*
-The following ButtonMap variable defines all possible buttons within the
-original 13 bits of space, along with attempting to investigate the remaining
-3 bits that are 'unused'. This is what led to finding that the 'Capture'
-button was operational on the stick.
-*/
-uint16_t ButtonMap[16] = {
-	0x01,
-	0x02,
-	0x04,
-	0x08,
-	0x10,
-	0x20,
-	0x40,
-	0x80,
-	0x100,
-	0x200,
-	0x400,
-	0x800,
-	0x1000,
-	0x2000,
-	0x4000,
-	0x8000,
-};
 
 /*** Debounce ****
 The following is some -really bad- debounce code. I have a more robust library
@@ -120,12 +95,6 @@ void SetupHardware(void) {
 	clock_prescale_set(clock_div_1);
 	// We can then initialize our hardware and peripherals, including the USB stack.
 
-	// Both PORTD and PORTB will be used for handling the buttons and stick.
-	DDRD  &= ~0xFF;
-	PORTD |=  0xFF;
-
-	DDRB  &= ~0xFF;
-	PORTB |=  0xFF;
 	// The USB stack should be initialized last.
 	USB_Init();
 }
@@ -234,63 +203,69 @@ void HID_Task(void) {
 	}
 }
 
+#define LOOP_LENGTH 60  // Must be an even positive integer greater than or equal to 10
+
 // Prepare the next report for the host.
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
-	// All of this code here is handled -really poorly-, and should be replaced with something a bit more production-worthy.
-	uint16_t buf_button   = 0x00;
-	uint8_t  buf_joystick = 0x00;
+	static USB_JoystickReport_Input_t last_report;
+	static uint16_t i = 0;
+	static uint8_t j = 0;
+
+	enum state_t {
+		SYNC_CONTROLLER,
+		LOOP,
+	};
+	static uint8_t state;
 
 	/* Clear the report contents */
 	memset(ReportData, 0, sizeof(USB_JoystickReport_Input_t));
 
-	buf_button   = (~PIND_DEBOUNCED & 0xFF) << (~PINB_DEBOUNCED & 0x08 ? 8 : 0);
-	buf_joystick = (~PINB_DEBOUNCED & 0xFF);
+	/* Reset the analog sticks and HAT to neutral positions */
+	ReportData->LX = 128;
+	ReportData->LY = 128;
+	ReportData->RX = 128;
+	ReportData->RY = 128;
+	ReportData->HAT = HAT_CENTER;
 
-	for (int i = 0; i < 16; i++) {
-		if (buf_button & (1 << i))
-			ReportData->Button |= ButtonMap[i];
+	if (j--)
+	{
+		memcpy(ReportData, &last_report, sizeof(USB_JoystickReport_Input_t));
+		return;
+	}
+	j = 4;
+
+	switch (state)
+	{
+		case SYNC_CONTROLLER:
+			if (i == 20 || i == 50)
+				ReportData->Button |= SWITCH_L | SWITCH_R;
+			else if (i == 80)
+				ReportData->Button |= SWITCH_A;
+			else if (i == 100)
+			{
+				state = LOOP;
+				i = 0;
+				break;
+			}
+			i++;
+			break;
+
+		case LOOP:
+			if (i == (LOOP_LENGTH) - 1)
+			{
+				i = 0;
+				return;
+			}
+			else if (i == (LOOP_LENGTH) - 2)
+				ReportData->Button |= SWITCH_B;
+			else if (i == 0 || i == 2 || i == (LOOP_LENGTH) - 8 || i == (LOOP_LENGTH) - 10)
+				ReportData->HAT = HAT_BOTTOM;
+			else if (!(i & 1))
+				ReportData->Button |= SWITCH_A;
+			i++;
+			break;
 	}
 
-	if (buf_joystick & 0x10)
-		ReportData->LX = 0;
-	else if (buf_joystick & 0x20)
-		ReportData->LX = 255;
-	else
-		ReportData->LX = 128;
-
-	if (buf_joystick & 0x80)
-		ReportData->LY = 0;
-	else if (buf_joystick & 0x40)
-		ReportData->LY = 255;
-	else
-		ReportData->LY = 128;
-
-	switch(buf_joystick & 0xF0) {
-		case 0x80: // Top
-			ReportData->HAT = 0x00;
-			break;
-		case 0xA0: // Top-Right
-			ReportData->HAT = 0x01;
-			break;
-		case 0x20: // Right
-			ReportData->HAT = 0x02;
-			break;
-		case 0x60: // Bottom-Right
-			ReportData->HAT = 0x03;
-			break;
-		case 0x40: // Bottom
-			ReportData->HAT = 0x04;
-			break;
-		case 0x50: // Bottom-Left
-			ReportData->HAT = 0x05;
-			break;
-		case 0x10: // Left
-			ReportData->HAT = 0x06;
-			break;
-		case 0x90: // Top-Left
-			ReportData->HAT = 0x07;
-			break;
-		default:
-			ReportData->HAT = 0x08;
-	}
+	/* Save this report for next time so we can repeat it if necessary */
+	memcpy(&last_report, ReportData, sizeof(USB_JoystickReport_Input_t));
 }
