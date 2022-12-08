@@ -211,7 +211,7 @@ void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 			if (i == (LOOP_LENGTH) - 1)
 			{
 				i = 0;
-				return;
+				break;
 			}
 			else if (i == (LOOP_LENGTH) - 2)
 				ReportData->Button |= SWITCH_B;
