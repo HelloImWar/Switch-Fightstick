@@ -1,19 +1,40 @@
-## Switch-Fightstick
-Proof-of-Concept Fightstick for the Nintendo Switch. Uses the LUFA library and reverse-engineering of the Pokken Tournament Pro Pad for the Wii U to enable custom fightsticks on the Switch System v3.0.0.
+# tableturf-grinder
 
-### Wait, what?
-On June 20, 2017, Nintendo released System Update v3.0.0 for the Nintendo Switch. Along with a number of additional features that were advertised or noted in the changelog, additional hidden features were added. One of those features allows for the use of compatible controllers, such as the Pokken Tournament Pro Pad, to be used on the Nintendo Switch.
+This is a program for AVR microcontrollers that uses the [LUFA library](https://github.com/abcminiuser/lufa) to control a Nintendo Switch console to automatically lose repeatedly in Splatoon 3's Tableturf Battle gamemode. Since every non-resign loss against a computer-controlled opponent gives you 40 experience points, this is a valid way to grind for experience points. This program is based on [progmem/Switch-Fightstick](https://github.com/progmem/Switch-Fightstick).
 
-Unlike the Wii U, which handles these controllers on a 'per-game' basis, the Switch treats the Pokken controller as if it was a Switch Pro Controller. Along with having the icon for the Pro Controller, it functions just like it in terms of using it in other games, apart from the lack of physical controls such as analog sticks, the buttons for the stick clicks, or other system buttons such as Home or Capture.
+## Required hardware
 
-### But games like ARMS use the analog sticks!
-The Pokken Tournament Pro Pad was made by HORI, who also makes controllers for other consoles; because of this, the descriptors provided to Nintendo for the Pokken controller are **very** similar to that of some third-party PS3 controllers. In fact, the Pokken Tournament Pro Pad -can- be used on the PS3 without anything special needing to be done. The original descriptors feature 13 buttons, two analog sticks, a HAT switch, and some vendor-specific items that we can safely ignore. Compare this to a PS3 controller, which has...13 buttons (4 Face, 4 Shoulders, 2 Sticks, Select/Start, and PS), two analog sticks, and a HAT switch (the D-Pad). 
+* An AVR microcontroller board with a USB port, such as an Arduino Uno, Leonardo, Nano or Micro, or a Teensy++ 2.0. 
+* A USB-A cable that can connect to the board. Most boards either require a USB-A to micro USB cable, USB-A to mini USB cable or USB-A to USB-C cable.
+* If your computer lacks USB-A ports (for example if you're using a Mac), you'll also need an adaptor that can connect USB devices to your computer.
 
-### What do you mean by 'original descriptors?'
-Turns out we can modify the descriptors to expose up to 16 buttons at **least**. The Switch Pro Controller has 14 buttons on it, and as it turns out, the modified set of descriptors does allow us to enable the use of the most important button:
+## Software installation
 
-### Is it the Captu-
+First, you'll have to configure this program for your microcontroller board. Open the "makefile" file in this repository and change the `MCU`, `ARCH` and `F_CPU` to correspond to the microcontroller that handles USB connections. Example values:
 
-# THE CAPTURE BUTTON
+| | `MCU` | `ARCH` | `F_CPU` |
+| -: | :- | :- | :- |
+| Teensy++ 2.0 | `at90usb1286` | `AVR8` | `16000000` |
+| Arduino Leonardo / Arduino Micro | `atmega32u4` | `AVR8` | `16000000` |
+| Arduino Uno / Arduino Nano | `atmega16u2` | `AVR8` | `16000000` |
 
-The Switch Pro Controller also exposes **additional** buttons within its descriptors; however, it's unknown as to what those do at this time. These come immediately after the HAT, so I'm under the assumption that they may be individual button presses instead of an angle. That being said, considering how flexible the Switch is with the Pokken controller descriptors, we may be able to mirror the Switch Pro Controller descriptors up to a certain point.
+Next, you have to download the LUFA library. If you used `git clone` to download this repository, you can just run `git submodule update --init` to download LUFA into the correct location. If you downloaded this repository using the "Download ZIP" button on the GitHub website, you'll have to [download LUFA manually](https://github.com/abcminiuser/lufa/archive/refs/tags/LUFA-210130.zip) and then extract it into the LUFA folder in this repository so that the LUFA folder in this repository contains the README.txt from LUFA.
+
+Next, compile this program. If you're Linux or macOS, you'll need to install the `make` and `avr-libc` packages from your package manager (e.g. APT or RPM for Linux or Homebrew for macOS). If you're using Windows, the easiest way is to install Windows Subsystem for Linux 2 and then install and use `make` and `avr-libc` in there. Once you have `make` and `avr-libc` installed, just run the command `make` while inside this directory to compile the program. This will result in a file called "Joystick.hex".
+
+Now you have to flash Joystick.hex onto your microcontroller. This step varies for different boards.
+
+### Teensy++ 2.0
+
+The [Teensy Loader](https://www.pjrc.com/teensy/loader.html) application can be used to upload .hex files onto Teensy boards through the USB port.
+
+### Arduino Leonardo / Arduino Micro
+
+The [Arduino IDE](https://www.arduino.cc/en/software) can be used for these boards to upload .hex files through the USB port. Go to File > Preferences and check the checkbox for "Show verbose output during upload". Use the Arduino IDE to upload any sketch, and then copy the avrdude command that it uses to upload the compiled .hex file to your Arduino board. Copy that command to a terminal, replacing the .hex file from Arduino IDE with the path to Joystick.hex. Make sure you double-press the reset button on the board a few seconds before uploading Joystick.hex so that avrdude can communicate with the bootloader.
+
+### Arduino Uno / Arduino Nano
+The primary microcontroller on these boards do not have USB capabilities, so you'll have to flash Joystick.hex onto the USB microcontroller on the board by following [this guide](https://docs.arduino.cc/hacking/software/DFUProgramming8U2). Just use Joystick.hex as the firmware file. If you want to use your Arduino board for something else afterwards, you'll have to flash the official firmware .hex file back onto the USB microcontroller.
+
+# Usage
+
+Now that you have the program uploaded to your microcontroller board, place your Nintendo Switch into its dock and open Splatoon 3. You can select any Rival (not players), but it is recommended to select the level 1 Baby Jelly in Tableturf Battle (in order to minimize the time per battle, we want a low level opponent so they don't use specials whose animations will prolong the battle). Once you get to the screen where you have to select your deck, plug the USB-A end of the cable into one of the USB ports in your dock and the other end of the cable into your microcontroller board. The program will keep running until you unplug the board.
