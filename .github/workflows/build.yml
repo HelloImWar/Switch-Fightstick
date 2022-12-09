@@ -44,7 +44,8 @@ jobs:
     - name: Store binary for atmega32u4
       run: mv Joystick.hex Joystick-atmega32u4.hex
 
-    - name: Create release on GitHub
+    - name: Create release on GitHub (only on push)
+      if: github.event_name == 'push'
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
