@@ -2,6 +2,10 @@
 
 This is a program for AVR microcontrollers that uses the [LUFA library](https://github.com/abcminiuser/lufa) to control a Nintendo Switch console to automatically lose repeatedly in Splatoon 3's Tableturf Battle gamemode. Since every non-resign loss against a computer-controlled opponent gives you 40 experience points, this is a valid way to grind for experience points. This program is based on [progmem/Switch-Fightstick](https://github.com/progmem/Switch-Fightstick).
 
+### Alternatives
+
+* [fga401/AutoTableTurf](https://github.com/fga401/AutoTableTurf) uses a capture card to capture the console screen and a Bluetooth adapter to act as a controller. Similar to this program but attempts to actually win at Tableturf.
+
 ## Required hardware
 
 * An AVR microcontroller board with a USB port, such as an Arduino Uno, Leonardo, Nano or Micro, or a Teensy++ 2.0. 
