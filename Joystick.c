@@ -160,7 +160,7 @@ void HID_Task(void) {
 	}
 }
 
-#define LOOP_LENGTH 60  // Must be an even positive integer greater than or equal to 14
+#define LOOP_LENGTH 30  // Must be an even positive integer greater than or equal to 14
 
 // Prepare the next report for the host.
 void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
