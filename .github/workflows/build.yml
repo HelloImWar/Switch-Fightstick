@@ -24,7 +24,7 @@ jobs:
       uses: bazhenov/action-avr-make@v1.0
 
     - name: Store binary for at90usb1286
-      run: mv Joystick.hex Joystick-at90usb1286.hex
+      run: mv Joystick.hex Joystick-at90usb1286.hex && mv Joystick.elf Joystick-at90usb1286.elf && mv Joystick.bin Joystick-at90usb1286.bin && mv Joystick.lss Joystick-at90usb1286.lss
 
     - name: Configure for atmega16u2
       run: sed -i -e 's/^MCU *=.*/MCU = atmega16u2/g' -e 's/^ARCH *=.*/ARCH = AVR8/g' -e 's/^F_CPU *=.*/F_CPU = 16000000/g' makefile
@@ -33,7 +33,7 @@ jobs:
       uses: bazhenov/action-avr-make@v1.0
 
     - name: Store binary for atmega16u2
-      run: mv Joystick.hex Joystick-atmega16u2.hex
+      run: mv Joystick.hex Joystick-atmega16u2.hex && mv Joystick.elf Joystick-atmega16u2.elf && mv Joystick.bin Joystick-atmega16u2.bin && mv Joystick.lss Joystick-atmega16u2.lss
 
     - name: Configure for atmega32u4
       run: sed -i -e 's/^MCU *=.*/MCU = atmega32u4/g' -e 's/^ARCH *=.*/ARCH = AVR8/g' -e 's/^F_CPU *=.*/F_CPU = 16000000/g' makefile
@@ -42,7 +42,7 @@ jobs:
       uses: bazhenov/action-avr-make@v1.0
 
     - name: Store binary for atmega32u4
-      run: mv Joystick.hex Joystick-atmega32u4.hex
+      run: mv Joystick.hex Joystick-atmega32u4.hex && mv Joystick.elf Joystick-atmega32u4.elf && mv Joystick.bin Joystick-atmega32u4.bin && mv Joystick.lss Joystick-atmega32u4.lss
 
     - name: Create release on GitHub (only on push)
       if: github.event_name == 'push'
@@ -53,4 +53,7 @@ jobs:
         prerelease: true
         title: "Latest build"
         files: |
+          *.elf
           *.hex
+          *.bin
+          *.lss
