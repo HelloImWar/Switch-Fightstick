@@ -8,9 +8,25 @@ This is a program for AVR microcontrollers that uses the [LUFA library](https://
 
 ## Required hardware
 
-* An AVR microcontroller board with a USB port, such as an Arduino Uno, Leonardo, Mega 2560 or Micro, or a Teensy++ 2.0. 
+* An 8-bit AVR microcontroller board with a USB port, such as an Arduino Uno, Leonardo, Mega 2560 or Micro, or a Teensy++ 2.0. 
 * A USB-A cable that can connect to the board. Most boards either require a USB-A to micro USB cable, USB-A to mini USB cable or USB-A to USB-C cable.
 * If your computer lacks USB-A ports (for example if you're using a Mac), you'll also need an adaptor that can connect USB devices to your computer.
+
+If your microcontroller board is not one of the ones mentioned above, make sure that the board has one of the following supported microcontrollers connected to the USB port:
+
+* AT90USB82
+* AT90USB162
+* AT90USB646
+* AT90USB647
+* AT90USB1286
+* AT90USB1287
+* ATmega8U2
+* ATmega16U2
+* ATmega16U4
+* ATmega32U2
+* ATmega32U4
+
+Although the official Arduino Uno R3 is compatible because it has an ATmega8U2 or ATmega16U2 acting as a secondary USB processor, most Arduino Uno clones are not compatible as they usually replace it with an FT232RL which is not capable of being programmed to act as a human interface device. Make sure to thoroughly check the documentation of your board.
 
 ## Software installation
 
@@ -49,13 +65,13 @@ Now that you have the program uploaded to your microcontroller board, place your
 
 Here are the instructions for manually compiling the Joystick.hex files.
 
-First, you'll have to configure this program for your microcontroller board. Open the "makefile" file in this repository and change the `MCU`, `ARCH` and `F_CPU` to correspond to the microcontroller that handles USB connections. Example values:
+First, you'll have to configure this program for your microcontroller board. Open the "makefile" file in this repository and change the `MCU` and `F_CPU` to correspond to the microcontroller that handles USB connections. `MCU` is the chip name of the target microcontroller chip in lowercase. `F_CPU` is the CPU frequency of the microcontroller in hertz. Example values:
 
-| | `MCU` | `ARCH` | `F_CPU` |
-| -: | :- | :- | :- |
-| Teensy++ 2.0 | `at90usb1286` | `AVR8` | `16000000` |
-| Arduino Leonardo / Arduino Micro | `atmega32u4` | `AVR8` | `16000000` |
-| Arduino Uno / Arduino Mega 2560 | `atmega16u2` | `AVR8` | `16000000` |
+| | `MCU` | `F_CPU` |
+| -: | :- | :- |
+| Teensy++ 2.0 | `at90usb1286` | `16000000` |
+| Arduino Leonardo / Arduino Micro | `atmega32u4` | `16000000` |
+| Arduino Uno / Arduino Mega 2560 | `atmega16u2` | `16000000` |
 
 Next, you have to download the LUFA library. If you used `git clone` to download this repository, you can just run `git submodule update --init --recursive` to download LUFA into the correct location. If you downloaded this repository using the "Download ZIP" button on the GitHub website, you'll have to [download LUFA manually](https://github.com/abcminiuser/lufa/archive/refs/tags/LUFA-210130.zip) and then extract it into the LUFA folder in this repository so that the LUFA folder in this repository contains the README.txt from LUFA.
 
