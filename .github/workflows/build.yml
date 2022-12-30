@@ -9,9 +9,16 @@ on:
     - cron: 42 06 9 * *
 
 jobs:
-  build:
-    name: Make build
+  make:
+    name: make
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        make-config: [
+          {mcu: 'at90usb1286', arch: 'AVR8', f-cpu: 16000000},
+          {mcu: 'atmega16u2', arch: 'AVR8', f-cpu: 16000000},
+          {mcu: 'atmega32u4', arch: 'AVR8', f-cpu: 16000000},
+        ]
 
     steps:
     - name: Checkout repository and submodules
@@ -19,29 +26,55 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Build for AT90USB1286
-      uses: ./.github/action-build
-      with:
-        mcu: at90usb1286
-        arch: AVR8
-        f-cpu: 16000000
+    - name: Create output directory
+      run: mkdir -p .action_build_outputs/*
 
-    - name: Build for ATmega16U2
-      uses: ./.github/action-build
-      with:
-        mcu: atmega16u2
-        arch: AVR8
-        f-cpu: 16000000
+    - name: Edit makefile
+      run: sed -i -e 's/^MCU *=.*/MCU = ${{ matrix.make-config.mcu }}/g' -e 's/^ARCH *=.*/ARCH = ${{ matrix.make-config.arch }}/g' -e 's/^F_CPU *=.*/F_CPU = ${{ matrix.make-config.f-cpu }}/g' makefile
 
-    - name: Build for ATmega32U4
-      uses: ./.github/action-build
+    - name: Compile for ${{ matrix.make-config.mcu }}
+      uses: ./.github/action-avr-toolchain
       with:
-        mcu: atmega32u4
-        arch: AVR8
-        f-cpu: 16000000
+        entrypoint: make
 
-    - name: Create release on GitHub (only on push)
-      if: github.event_name == 'push'
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.make-config.mcu }} ${{ matrix.make-config.arch }} ${{ matrix.make-config.f-cpu }}
+        path: |
+          obj
+          *.bin
+          *.eep
+          *.elf
+          *.hex
+          *.lss
+          *.map
+          *.sym
+
+    - name: Extract release files
+      run: mv Joystick.hex .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.hex && mv Joystick.elf .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.elf && mv Joystick.bin .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.bin && mv Joystick.lss .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.lss
+
+    - name: Append release files to release artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: release
+        path: |
+          .action_build_outputs/*
+
+  release:
+    name: Create release (only on push)
+    runs-on: ubuntu-latest
+    needs: make
+    if: github.event_name == 'push'
+
+    steps:
+    - name: Download release artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: release
+        path: .action_release
+
+    - name: Create release on GitHub
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -49,4 +82,4 @@ jobs:
         prerelease: true
         title: Latest build
         files: |
-          .action_build_outputs/*
+          .action_release/*
