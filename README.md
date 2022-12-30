@@ -1,4 +1,4 @@
-# tableturf-grinder
+# tableturf-grinder [![Build](https://github.com/HelloImWar/tableturf-grinder/actions/workflows/build.yml/badge.svg)](https://github.com/HelloImWar/tableturf-grinder/actions/workflows/build.yml)
 
 This is a program for AVR microcontrollers that uses the [LUFA library](https://github.com/abcminiuser/lufa) to control a Nintendo Switch console to automatically lose repeatedly in Splatoon 3's Tableturf Battle gamemode. Since every non-resign loss against a computer-controlled opponent gives you 40 experience points, this is a valid way to grind for experience points. This program is based on [progmem/Switch-Fightstick](https://github.com/progmem/Switch-Fightstick).
 
