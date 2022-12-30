@@ -1,0 +1,21 @@
+name: Make build
+description: Make build
+inputs:
+  mcu:
+    required: true
+  arch:
+    required: true
+    default: AVR8
+  f-cpu:
+    required: true
+    default: 16000000
+runs:
+  using: composite
+  steps:
+    - run: sed -i -e 's/^MCU *=.*/MCU = ${{ inputs.mcu }}/g' -e 's/^ARCH *=.*/ARCH = ${{ inputs.arch }}/g' -e 's/^F_CPU *=.*/F_CPU = ${{ inputs.f-cpu }}/g' makefile
+      shell: bash
+    - uses: ./.github/action-avr-toolchain
+      with:
+        entrypoint: make
+    - run: mv Joystick.hex Joystick-${{ inputs.mcu }}.hex && mv Joystick.elf Joystick-${{ inputs.mcu }}.elf && mv Joystick.bin Joystick-${{ inputs.mcu }}.bin && mv Joystick.lss Joystick-${{ inputs.mcu }}.lss
+      shell: bash

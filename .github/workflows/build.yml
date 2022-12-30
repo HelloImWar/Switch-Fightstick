@@ -17,41 +17,35 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Configure for at90usb1286
-      run: sed -i -e 's/^MCU *=.*/MCU = at90usb1286/g' -e 's/^ARCH *=.*/ARCH = AVR8/g' -e 's/^F_CPU *=.*/F_CPU = 16000000/g' makefile
+    - name: Build for AT90USB1286
+      uses: ./.github/action-build
+      with:
+        mcu: at90usb1286
+        arch: AVR8
+        f-cpu: 16000000
 
-    - name: Compile for at90usb1286
-      uses: bazhenov/action-avr-make@v1.0
+    - name: Build for ATmega16U2
+      uses: ./.github/action-build
+      with:
+        mcu: atmega16u2
+        arch: AVR8
+        f-cpu: 16000000
 
-    - name: Store binary for at90usb1286
-      run: mv Joystick.hex Joystick-at90usb1286.hex && mv Joystick.elf Joystick-at90usb1286.elf && mv Joystick.bin Joystick-at90usb1286.bin && mv Joystick.lss Joystick-at90usb1286.lss
-
-    - name: Configure for atmega16u2
-      run: sed -i -e 's/^MCU *=.*/MCU = atmega16u2/g' -e 's/^ARCH *=.*/ARCH = AVR8/g' -e 's/^F_CPU *=.*/F_CPU = 16000000/g' makefile
-
-    - name: Compile for atmega16u2
-      uses: bazhenov/action-avr-make@v1.0
-
-    - name: Store binary for atmega16u2
-      run: mv Joystick.hex Joystick-atmega16u2.hex && mv Joystick.elf Joystick-atmega16u2.elf && mv Joystick.bin Joystick-atmega16u2.bin && mv Joystick.lss Joystick-atmega16u2.lss
-
-    - name: Configure for atmega32u4
-      run: sed -i -e 's/^MCU *=.*/MCU = atmega32u4/g' -e 's/^ARCH *=.*/ARCH = AVR8/g' -e 's/^F_CPU *=.*/F_CPU = 16000000/g' makefile
-
-    - name: Compile for atmega32u4
-      uses: bazhenov/action-avr-make@v1.0
-
-    - name: Store binary for atmega32u4
-      run: mv Joystick.hex Joystick-atmega32u4.hex && mv Joystick.elf Joystick-atmega32u4.elf && mv Joystick.bin Joystick-atmega32u4.bin && mv Joystick.lss Joystick-atmega32u4.lss
+    - name: Build for ATmega32U4
+      uses: ./.github/action-build
+      with:
+        mcu: atmega32u4
+        arch: AVR8
+        f-cpu: 16000000
 
     - name: Create release on GitHub (only on push)
       if: github.event_name == 'push'
-      uses: "marvinpinto/action-automatic-releases@latest"
+      uses: marvinpinto/action-automatic-releases@latest
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: latest
         prerelease: true
-        title: "Latest build"
+        title: Latest build
         files: |
           *.elf
           *.hex

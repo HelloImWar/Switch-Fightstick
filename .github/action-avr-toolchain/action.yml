@@ -1,0 +1,5 @@
+name: AVR toolchain
+description: AVR toolchain
+runs:
+  using: docker
+  image: docker://lpodkalicki/avr-toolchain
