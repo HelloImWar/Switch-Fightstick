@@ -9,13 +9,34 @@ inputs:
   f-cpu:
     required: true
     default: 16000000
+  out-dir:
+    required: true
+    default: .action_build_outputs
 runs:
   using: composite
   steps:
+    - run: mkdir -p ${{ inputs.out-dir }}
+      shell: bash
     - run: sed -i -e 's/^MCU *=.*/MCU = ${{ inputs.mcu }}/g' -e 's/^ARCH *=.*/ARCH = ${{ inputs.arch }}/g' -e 's/^F_CPU *=.*/F_CPU = ${{ inputs.f-cpu }}/g' makefile
       shell: bash
     - uses: ./.github/action-avr-toolchain
       with:
         entrypoint: make
-    - run: mv Joystick.hex Joystick-${{ inputs.mcu }}.hex && mv Joystick.elf Joystick-${{ inputs.mcu }}.elf && mv Joystick.bin Joystick-${{ inputs.mcu }}.bin && mv Joystick.lss Joystick-${{ inputs.mcu }}.lss
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.mcu }} ${{ inputs.arch }} ${{ inputs.f-cpu }}
+        path: |
+          obj
+          *.bin
+          *.eep
+          *.elf
+          *.hex
+          *.lss
+          *.map
+          *.sym
+    - run: mv Joystick.hex ${{ inputs.out-dir }}/Joystick-${{ inputs.mcu }}.hex && mv Joystick.elf ${{ inputs.out-dir }}/Joystick-${{ inputs.mcu }}.elf && mv Joystick.bin ${{ inputs.out-dir }}/Joystick-${{ inputs.mcu }}.bin && mv Joystick.lss ${{ inputs.out-dir }}/Joystick-${{ inputs.mcu }}.lss
       shell: bash
+    - uses: ./.github/action-avr-toolchain
+      with:
+        entrypoint: make
+        args: clean

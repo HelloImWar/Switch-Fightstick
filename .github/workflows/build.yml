@@ -49,7 +49,4 @@ jobs:
         prerelease: true
         title: Latest build
         files: |
-          *.elf
-          *.hex
-          *.bin
-          *.lss
+          .action_build_outputs/*
