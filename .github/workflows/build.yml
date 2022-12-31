@@ -26,9 +26,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Create output directory
-      run: mkdir -p .action_build_outputs/*
-
     - name: Compile for ${{ matrix.make-config.mcu }}
       uses: docker://lpodkalicki/avr-toolchain
       with:
@@ -50,7 +47,7 @@ jobs:
           *.sym
 
     - name: Extract release files
-      run: mv Joystick.hex .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.hex && mv Joystick.elf .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.elf && mv Joystick.bin .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.bin && mv Joystick.lss .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.lss
+      run: mkdir -p .action_build_outputs && mv Joystick.hex .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.hex && mv Joystick.elf .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.elf && mv Joystick.bin .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.bin && mv Joystick.lss .action_build_outputs/Joystick-${{ matrix.make-config.mcu }}.lss
 
     - name: Append release files to release artifact
       uses: actions/upload-artifact@v3
