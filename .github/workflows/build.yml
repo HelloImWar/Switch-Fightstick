@@ -30,7 +30,7 @@ jobs:
       run: mkdir -p .action_build_outputs/*
 
     - name: Compile for ${{ matrix.make-config.mcu }}
-      uses: ./.github/action-avr-toolchain
+      uses: docker://lpodkalicki/avr-toolchain
       with:
         entrypoint: make
         args: MCU=${{ matrix.make-config.mcu }} ARCH=${{ matrix.make-config.arch }} F_CPU=${{ matrix.make-config.f-cpu }}
