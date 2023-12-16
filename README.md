@@ -1,4 +1,4 @@
-# tableturf-grinder [![Build](https://github.com/HelloImWar/tableturf-grinder/actions/workflows/build.yml/badge.svg)](https://github.com/HelloImWar/tableturf-grinder/actions/workflows/build.yml)
+# tableturf-grinder [![Build](https://github.com/white-axe/tableturf-grinder/actions/workflows/build.yml/badge.svg)](https://github.com/white-axe/tableturf-grinder/actions/workflows/build.yml)
 
 This is a program for AVR microcontrollers that uses the [LUFA library](https://github.com/abcminiuser/lufa) to control a Nintendo Switch console to automatically lose repeatedly in Splatoon 3's Tableturf Battle gamemode. Since every non-resign loss against a computer-controlled opponent gives you 40 experience points, this is a valid way to grind for experience points. This program is based on [progmem/Switch-Fightstick](https://github.com/progmem/Switch-Fightstick).
 
@@ -30,7 +30,7 @@ Although the official Arduino Uno R3 is compatible because it has an ATmega8U2 o
 
 ## Software installation
 
-If you are using an Arduino Uno, Leonardo, Mega 2560, Micro or a Teensy++ 2.0 or any board with the same microcontrollers, you can download a prebuilt version of this program from [the releases page on GitHub](https://github.com/HelloImWar/tableturf-grinder/releases/tag/latest). The files on the releases page are automatically recompiled every time this repository is updated. Make sure to download the correct file for your board:
+If you are using an Arduino Uno, Leonardo, Mega 2560, Micro or a Teensy++ 2.0 or any board with the same microcontrollers, you can download a prebuilt version of this program from [the releases page on GitHub](https://github.com/white-axe/tableturf-grinder/releases/tag/latest). The files on the releases page are automatically recompiled every time this repository is updated. Make sure to download the correct file for your board:
 
 | Board | File |
 | -: | :- |
